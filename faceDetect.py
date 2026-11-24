@@ -1,10 +1,13 @@
 import math
 import cv2
+import pyttsx3
 
-# Initialize webcam
+engine = pyttsx3.init()
+engine.say("Come to our stand")
+engine.runAndWait()
+
 cap = cv2.VideoCapture(0)
 
-# Initialize YuNet detector
 detector = cv2.FaceDetectorYN.create(
     model="face_detection_yunet_2023mar.onnx",
     config="",
@@ -15,21 +18,17 @@ detector = cv2.FaceDetectorYN.create(
 )
 
 while True:
-    # Read webcam frame
     ret, frame = cap.read()
 
     if not ret:
         print("Failed to access webcam")
         break
 
-    # Get current frame dimensions
     h, w, _ = frame.shape
     detector.setInputSize((w, h))
 
-    # Detect faces
     _, faces = detector.detect(frame)
 
-    # Draw bounding boxes
     if faces is not None:
         for face in faces:
             x, y, box_w, box_h = map(int, face[:4])
@@ -38,7 +37,6 @@ while True:
             cv2.rectangle(frame,(x, y), (x + box_w, y + box_h), (0, 255, 0), 2)
             cv2.circle(frame, center, 3, (0,0,255), -1)
 
-    # Display webcam feed
     cv2.namedWindow("Live Face Detection", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("Live Face Detection", 1920, 1080)
     cv2.imshow("Live Face Detection", frame)
